@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pelacak Pengeluaran</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f7fa;
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .expense-item {
+            transition: all 0.2s ease;
+        }
+        
+        .expense-item:active {
+            background-color: #f0f0f0;
+        }
+        
+        .expense-item.deleting {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Login Page -->
+        <div id="login-page" class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md slide-in">
+                <div class="text-center mb-8">
+                    <svg class="w-16 h-16 mx-auto text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h1 class="text-2xl font-bold mt-4 text-gray-800">Pelacak Pengeluaran</h1>
+                    <p class="text-gray-500 mt-1">Kelola keuangan Anda dengan mudah</p>
+                </div>
+                
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="email@example.com" required>
+                    </div>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
+                        <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="••••••••" required>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">Masuk</button>
+                </form>
+                
+                <div class="mt-6 text-center">
+                    <p class="text-gray-600">Belum punya akun? <a href="#" id="show-register" class="text-blue-600 font-medium hover:underline">Daftar</a></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Register Page -->
+        <div id="register-page" class="min-h-screen flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md slide-in">
+                <div class="text-center mb-8">
+                    <svg class="w-16 h-16 mx-auto text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                    </svg>
+                    <h1 class="text-2xl font-bold mt-4 text-gray-800">Buat Akun Baru</h1>
+                    <p class="text-gray-500 mt-1">Mulai kelola keuangan Anda</p>
+                </div>
+                
+                <form id="register-form" class="space-y-4">
+                    <div>
+                        <label for="reg-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="reg-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="email@example.com" required>
+                    </div>
+                    
+                    <div>
+                        <label for="reg-password" class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
+                        <input type="password" id="reg-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Minimal 6 karakter" required>
+                    </div>
+                    
+                    <div>
+                        <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Kata Sandi</label>
+                        <input type="password" id="confirm-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ulangi kata sandi" required>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">Daftar</button>
+                </form>
+                
+                <div class="mt-6 text-center">
+                    <p class="text-gray-600">Sudah punya akun? <a href="#" id="show-login" class="text-blue-600 font-medium hover:underline">Masuk</a></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Page (Expense List) -->
+        <div id="main-page" class="min-h-screen flex flex-col hidden">
+            <!-- App Bar -->
+            <div class="bg-white shadow-sm">
+                <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+                    <h1 class="text-xl font-bold text-gray-800">Pelacak Pengeluaran</h1>
+                    <button id="logout-btn" class="text-gray-600 hover:text-gray-800 flex items-center">
+                        <span class="mr-1">Keluar</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Expense Summary -->
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                <div class="max-w-4xl mx-auto px-4 py-6">
+                    <p class="text-blue-100 font-medium">Total Pengeluaran</p>
+                    <h2 class="text-3xl font-bold mt-1">Rp 1.250.000</h2>
+                </div>
+            </div>
+            
+            <!-- Expense List -->
+            <div class="flex-grow bg-gray-50">
+                <div class="max-w-4xl mx-auto px-4 py-6">
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div id="expense-list" class="divide-y divide-gray-100">
+                            <!-- Expense Item 1 -->
+                            <div class="expense-item p-4 hover:bg-gray-50">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="font-medium text-gray-800">Makan Siang di Restoran</h3>
+                                        <div class="flex items-center mt-1">
+                                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded">Makanan</span>
+                                            <span class="text-gray-500 text-sm ml-2">21 Jun 2023</span>
+                                        </div>
+                                    </div>
+                                    <span class="font-medium text-gray-800">Rp 75.000</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Expense Item 2 -->
+                            <div class="expense-item p-4 hover:bg-gray-50">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="font-medium text-gray-800">Bensin Mobil</h3>
+                                        <div class="flex items-center mt-1">
+                                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded">Transportasi</span>
+                                            <span class="text-gray-500 text-sm ml-2">20 Jun 2023</span>
+                                        </div>
+                                    </div>
+                                    <span class="font-medium text-gray-800">Rp 250.000</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Expense Item 3 -->
+                            <div class="expense-item p-4 hover:bg-gray-50">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="font-medium text-gray-800">Belanja Bulanan</h3>
+                                        <div class="flex items-center mt-1">
+                                            <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2 py-0.5 rounded">Lainnya</span>
+                                            <span class="text-gray-500 text-sm ml-2">18 Jun 2023</span>
+                                        </div>
+                                    </div>
+                                    <span class="font-medium text-gray-800">Rp 925.000</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Empty State -->
+                        <div id="empty-state" class="p-8 text-center hidden">
+                            <svg class="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <h3 class="mt-4 text-gray-700 font-medium">Belum ada pengeluaran</h3>
+                            <p class="mt-1 text-gray-500 text-sm">Tambahkan pengeluaran pertama Anda dengan menekan tombol + di bawah</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add Expense Button -->
+            <div class="fixed bottom-6 right-6">
+                <button id="add-expense-btn" class="bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Add Expense Modal -->
+        <div id="add-expense-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 slide-in">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Tambah Pengeluaran</h2>
+                    <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="add-expense-form" class="space-y-4">
+                    <div>
+                        <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Jumlah (Rp)</label>
+                        <input type="number" id="amount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="0" required>
+                    </div>
+                    
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                        <input type="text" id="description" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: Makan Siang" required>
+                    </div>
+                    
+                    <div>
+                        <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                        <select id="category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                            <option value="" disabled selected>Pilih kategori</option>
+                            <option value="Makanan">Makanan</option>
+                            <option value="Transportasi">Transportasi</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex space-x-3 pt-2">
+                        <button type="button" id="cancel-add" class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition duration-200">Batal</button>
+                        <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Delete Confirmation Modal -->
+        <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 slide-in">
+                <div class="text-center mb-6">
+                    <svg class="w-12 h-12 mx-auto text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    <h2 class="text-xl font-bold text-gray-800 mt-4">Hapus Pengeluaran?</h2>
+                    <p class="text-gray-600 mt-1">Tindakan ini tidak dapat dibatalkan</p>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button id="cancel-delete" class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition duration-200">Batal</button>
+                    <button id="confirm-delete" class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-200">Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginPage = document.getElementById('login-page');
+        const registerPage = document.getElementById('register-page');
+        const mainPage = document.getElementById('main-page');
+        const addExpenseModal = document.getElementById('add-expense-modal');
+        const deleteModal = document.getElementById('delete-modal');
+        const emptyState = document.getElementById('empty-state');
+        const expenseList = document.getElementById('expense-list');
+        
+        // Show Register Page
+        document.getElementById('show-register').addEventListener('click', function(e) {
+            e.preventDefault();
+            loginPage.classList.add('hidden');
+            registerPage.classList.remove('hidden');
+        });
+        
+        // Show Login Page
+        document.getElementById('show-login').addEventListener('click', function(e) {
+            e.preventDefault();
+            registerPage.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+        });
+        
+        // Login Form Submit
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // In a real app, this would authenticate with Supabase
+            loginPage.classList.add('hidden');
+            mainPage.classList.remove('hidden');
+        });
+        
+        // Register Form Submit
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // In a real app, this would register with Supabase
+            registerPage.classList.add('hidden');
+            mainPage.classList.remove('hidden');
+        });
+        
+        // Logout Button
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            // In a real app, this would logout from Supabase
+            mainPage.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+        });
+        
+        // Show Add Expense Modal
+        document.getElementById('add-expense-btn').addEventListener('click', function() {
+            addExpenseModal.classList.remove('hidden');
+        });
+        
+        // Close Add Expense Modal
+        document.getElementById('close-modal').addEventListener('click', function() {
+            addExpenseModal.classList.add('hidden');
+        });
+        
+        document.getElementById('cancel-add').addEventListener('click', function() {
+            addExpenseModal.classList.add('hidden');
+        });
+        
+        // Add Expense Form Submit
+        document.getElementById('add-expense-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const amount = document.getElementById('amount').value;
+            const description = document.getElementById('description').value;
+            const category = document.getElementById('category').value;
+            
+            // In a real app, this would add to Supabase
+            // For demo, we'll add to the UI
+            addExpenseToUI(description, category, amount);
+            
+            // Reset form and close modal
+            this.reset();
+            addExpenseModal.classList.add('hidden');
+            
+            // Hide empty state if visible
+            if (!emptyState.classList.contains('hidden')) {
+                emptyState.classList.add('hidden');
+            }
+        });
+        
+        // Setup long press for delete on expense items
+        const expenseItems = document.querySelectorAll('.expense-item');
+        expenseItems.forEach(item => {
+            let timer;
+            
+            item.addEventListener('touchstart', function() {
+                timer = setTimeout(() => {
+                    showDeleteModal(item);
+                }, 800);
+            });
+            
+            item.addEventListener('touchend', function() {
+                clearTimeout(timer);
+            });
+            
+            item.addEventListener('mousedown', function() {
+                timer = setTimeout(() => {
+                    showDeleteModal(item);
+                }, 800);
+            });
+            
+            item.addEventListener('mouseup', function() {
+                clearTimeout(timer);
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                clearTimeout(timer);
+            });
+        });
+        
+        // Show Delete Modal
+        function showDeleteModal(item) {
+            deleteModal.classList.remove('hidden');
+            
+            // Setup confirm delete button
+            document.getElementById('confirm-delete').onclick = function() {
+                // In a real app, this would delete from Supabase
+                // For demo, we'll remove from UI
+                item.classList.add('deleting');
+                setTimeout(() => {
+                    item.remove();
+                    
+                    // Show empty state if no expenses left
+                    if (expenseList.children.length === 0) {
+                        emptyState.classList.remove('hidden');
+                    }
+                }, 300);
+                
+                deleteModal.classList.add('hidden');
+            };
+        }
+        
+        // Cancel Delete
+        document.getElementById('cancel-delete').addEventListener('click', function() {
+            deleteModal.classList.add('hidden');
+        });
+        
+        // Add expense to UI
+        function addExpenseToUI(description, category, amount) {
+            const now = new Date();
+            const date = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+            
+            // Create category badge color based on category
+            let categoryColor;
+            switch(category) {
+                case 'Makanan':
+                    categoryColor = 'blue';
+                    break;
+                case 'Transportasi':
+                    categoryColor = 'green';
+                    break;
+                default:
+                    categoryColor = 'purple';
+            }
+            
+            const expenseItem = document.createElement('div');
+            expenseItem.className = 'expense-item p-4 hover:bg-gray-50 fade-in';
+            expenseItem.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-medium text-gray-800">${description}</h3>
+                        <div class="flex items-center mt-1">
+                            <span class="bg-${categoryColor}-100 text-${categoryColor}-800 text-xs font-medium px-2 py-0.5 rounded">${category}</span>
+                            <span class="text-gray-500 text-sm ml-2">${date}</span>
+                        </div>
+                    </div>
+                    <span class="font-medium text-gray-800">Rp ${Number(amount).toLocaleString('id-ID')}</span>
+                </div>
+            `;
+            
+            // Add long press event for delete
+            let timer;
+            expenseItem.addEventListener('touchstart', function() {
+                timer = setTimeout(() => {
+                    showDeleteModal(expenseItem);
+                }, 800);
+            });
+            
+            expenseItem.addEventListener('touchend', function() {
+                clearTimeout(timer);
+            });
+            
+            expenseItem.addEventListener('mousedown', function() {
+                timer = setTimeout(() => {
+                    showDeleteModal(expenseItem);
+                }, 800);
+            });
+            
+            expenseItem.addEventListener('mouseup', function() {
+                clearTimeout(timer);
+            });
+            
+            expenseItem.addEventListener('mouseleave', function() {
+                clearTimeout(timer);
+            });
+            
+            // Add to expense list
+            expenseList.prepend(expenseItem);
+        }
+    </script>
+</body>
+</html>
