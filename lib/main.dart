@@ -8,8 +8,8 @@ import 'dart:async';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
-    url: 'https://gjgqviqnegtumkwprwao.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdqZ3F2aXFuZWd0dW1rd3Byd2FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NzgxMTEsImV4cCI6MjA2NjA1NDExMX0.NqXxpXIB8ExQBIZbB_r_PMkTxQ0ZRi3ZrAKmJvI-HG0',
+    url: 'your_url',
+    anonKey: 'your_anonKey',
   );
   runApp(
     ChangeNotifierProvider(
